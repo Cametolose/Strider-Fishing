@@ -1,4 +1,18 @@
-import minescript, re, time, random
+import minescript, re, time, random, threading
+import mc_tools as mt
+
+# ==================== CONFIGURATION ====================
+
+MOUSE_UNLOCK_KEY = "U" # Set key to ungrab/unlock your mouse. The same key locks/grabs it again. Used to run unfocused and/or multiple accounts
+
+FISHING_MIN_DURATION = 116 # Seconds
+FISHING_MAX_DURATION = 140 # Seconds
+
+SEARCH_MAX_DISTANCE  = 6   # Blocks to search in front of you for Strider (6 is good trust me)
+
+# These are the most useful options, if you want to change some randomized delays, you gotta scroll through the code
+
+# =======================================================
 
 axe_list = {
     "VENATOR_GENESIS",
@@ -24,8 +38,25 @@ class Manager:
     def __init__(self):
         self.hasHooked = False
         self.found = False
+        self.mouse_locked = True
         self.fishing_start_time = None
-        self.fishing_duration = random.uniform(116, 140) # Random duration between 116 and 140 seconds
+        self.fishing_duration = random.uniform(FISHING_MIN_DURATION, FISHING_MAX_DURATION) # Random duration between configured time
+
+    def start_key_listener(self):
+            """Background listener to (un)lock the mouse with a keybind"""
+            with minescript.EventQueue() as event_queue:
+                event_queue.register_key_listener()
+
+                while True:
+                    event = event_queue.get()
+                    if event.type == minescript.EventType.KEY and event.action == 1:
+                        if event.key == ord(MOUSE_UNLOCK_KEY.upper()):
+                            if self.mouse_locked:
+                                mt.unlock_mouse(blocking=False)
+                                self.mouse_locked = False
+                            else:
+                                mt.lock_mouse()
+                                self.mouse_locked = True
 
     def get_inventory(self):
         """Returns a list of (sb_id, item) tuples from inventory"""
@@ -34,7 +65,7 @@ class Manager:
 
         for item in inv:
             raw = str(item.nbt)
-            match = re.search(r'id:"([^"]+)"', raw)
+            match = re.search(r'\bid:"([^"]+)"', raw)
             if match:
                 sb_id = match.group(1)
             else:
@@ -50,7 +81,7 @@ class Manager:
             return None
 
         # Suche direkt den id-Wert innerhalb des Strings
-        match = re.search(r'id:"([^"]+)"', str(hand_raw))
+        match = re.search(r'\bid:"([^"]+)"', str(hand_raw))
         if match:
             return match.group(1)
         return None
@@ -111,7 +142,7 @@ class Manager:
 
     def search_entities(self):
         """Searches for armor stands named "!!!" (Fish indicator)"""
-        entities = minescript.entities(max_distance=6)
+        entities = minescript.entities(max_distance=SEARCH_MAX_DISTANCE)
         for e in entities:
             if e.type == ("entity.minecraft.armor_stand") and e.name == ("!!!"):
                 # print(f"Name: {e.name}, Type: {e.type}")
@@ -178,10 +209,16 @@ class Manager:
 
     def run(self):
         """Main loop to alternate between fishing and attacking"""
+
+        # Start the keybind thread
+        listener_thread = threading.Thread(target=self.start_key_listener, daemon=True)
+        listener_thread.start()
+
         while True:
             self.start_fishing_cycle()
             self.attack()
 
-manager = Manager()
 
+
+manager = Manager()
 manager.run()
