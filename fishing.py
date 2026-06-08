@@ -1,5 +1,5 @@
 import minescript, re, time, random, threading
-import mc_tools as mt
+import mc_tools as mt # Thanks to SmartBoty
 
 # ==================== CONFIGURATION ====================
 
