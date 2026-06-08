@@ -13,6 +13,7 @@
 * **Auto-Gear Swap:** Automatically switches between your fishing rod and your combat axe.
 * **Human-like Delays:** Uses randomized sleep intervals so it doesn't look *completely* like a robot.
 * **Strider Shredder:** Triggers your axe buff, then left-clicks until the mobs are dead.
+* **Mouse Unlock:** Unlocks your mouse from the game, so it can run unfocused and on multiple accounts. Thanks to SmartBoty's MC-Tools: https://github.com/SmaertBoty/MC-Tools
 
 ---
 
