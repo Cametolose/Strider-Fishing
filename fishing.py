@@ -8,7 +8,7 @@ MOUSE_UNLOCK_KEY = "U" # Set key to ungrab/unlock your mouse. The same key locks
 FISHING_MIN_DURATION = 116 # Seconds
 FISHING_MAX_DURATION = 140 # Seconds
 
-SEARCH_MAX_DISTANCE  = 6   # Blocks to search in front of you for Strider (6 is good trust me)
+SEARCH_MAX_DISTANCE  = 6   # Blocks to search in front of you for Fish (!!! Armorstand) - (6 is good trust me)
 
 # These are the most useful options, if you want to change some randomized delays, you gotta scroll through the code
 
